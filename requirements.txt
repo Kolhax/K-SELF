@@ -1,0 +1,11 @@
+aiohttp
+cfscrape
+colorama
+discord.py-self
+hmtai
+httpx
+lxml
+Requests
+requests_futures
+socid_extractor
+torrequest
