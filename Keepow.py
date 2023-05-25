@@ -12,6 +12,53 @@ import requests
 import nmap
 import string
 
+def ask_gpt(safeInput):
+    # Prepare the data payload
+    data = {
+        "prompt": safeInput
+    }
+    payload = json.dumps(data)
+
+    # Set the headers
+    headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/110.0",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Content-Type": "application/json",
+        "Origin": "https://chatbot.theb.ai",
+        "Referer": "https://chatbot.theb.ai/"
+    }
+
+    # Send the POST request
+    url = "https://chatbot.theb.ai/api/chat-process"
+    response = requests.post(url, data=payload, headers=headers)
+
+    # Process the response
+    if response.status_code == 200:
+        response_text = response.text
+
+        # Find the last JSON string in the response text
+        json_strings = response_text.strip().split('\n')
+        last_json_string = json_strings[-1]
+
+        response_json = json.loads(last_json_string)
+        return response_json['text']
+    else:
+        return "Error: " + response.status_code
+
+def clean_string(input_string):
+    # Remove empty lines
+    input_string = re.sub(r'^\s*$', '', input_string, flags=re.MULTILINE)
+    
+    # Remove lines that start with a non-letter character (excluding punctuation)
+    input_string = re.sub(r'^[^a-zA-Z\s.,!?]+.*$', '', input_string, flags=re.MULTILINE)
+    
+    # Concatenate all words together
+    cleaned_words = re.findall(r'\b\w+\b', input_string)
+    cleaned_sentence = ' '.join(cleaned_words)
+    
+    return cleaned_sentence
+
 def pasteupload(content):
     post = requests.post("https://paste.kepar.ml/documents", data=content.encode('utf-8'))
     return "https://paste.kepar.ml/" + post.json()["key"]
@@ -264,6 +311,16 @@ class random(commands.Cog):
         await ctx.message.add_reaction("🔻")
         print(f"[>]  POLL, i would say uh...., can a bot participate?")
 
+    @commands.command()
+    async def chatgpt(self,ctx,*,message=None):
+        if message is None:
+            await ctx.message.edit(f'ask him something...')
+        else:
+            await ctx.message.edit(f'Thinking...')
+            print('[>] ChatGPT is Thinking...')
+            proc = ask_gpt(message)
+            await ctx.message.edit(proc)
+            print('[>] ChatGPT Answered, This shit can think!')
 class nuker(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
