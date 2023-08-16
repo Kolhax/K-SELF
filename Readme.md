@@ -1,4 +1,4 @@
-# K-self
+# K-self (Free Version)
 a simple selfbot using python
 https://www.reddit.com/r/Discord_selfbots/comments/13lypjn/a_new_selfbot_kself_soon_avaible
 # use
